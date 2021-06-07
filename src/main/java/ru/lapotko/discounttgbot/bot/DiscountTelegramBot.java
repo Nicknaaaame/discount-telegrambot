@@ -1,16 +1,11 @@
 package ru.lapotko.discounttgbot.bot;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.lapotko.discounttgbot.command.CommandContainer;
-import ru.lapotko.discounttgbot.command.CommandName;
+import ru.lapotko.discounttgbot.handler.UpdateReceiveHandler;
 
 @Component
 public class DiscountTelegramBot extends TelegramLongPollingBot {
@@ -19,10 +14,10 @@ public class DiscountTelegramBot extends TelegramLongPollingBot {
     @Value("${bot.username}")
     private String botUsername;
 
-    private final CommandContainer commandContainer;
+    private final UpdateReceiveHandler updateReceiveHandler;
 
-    public DiscountTelegramBot(@Lazy CommandContainer commandContainer) {
-        this.commandContainer = commandContainer;
+    public DiscountTelegramBot(UpdateReceiveHandler updateReceiveHandler) {
+        this.updateReceiveHandler = updateReceiveHandler;
     }
 
     @Override
@@ -37,21 +32,11 @@ public class DiscountTelegramBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-
-        Message message = update.getMessage();
-        if (update.hasMessage() && message.hasText()) {
-            String textOfMessage = message.getText();
-            try {
-                if (textOfMessage.startsWith("/")) {
-                    String commandName = textOfMessage.split(" ")[0].toLowerCase();
-                    commandContainer.findCommand(commandName).execute(update);
-                } else {
-                    commandContainer.findCommand(CommandName.NOCOMMAND.getName()).execute(update);
-                }
-            } catch (TelegramApiException e) {
-                //TODO: add logging
-                e.printStackTrace();
-            }
+        try {
+            execute(updateReceiveHandler.handleUpdate(update));
+        } catch (TelegramApiException e) {
+            //TODO: add logging
+            e.printStackTrace();
         }
     }
 }

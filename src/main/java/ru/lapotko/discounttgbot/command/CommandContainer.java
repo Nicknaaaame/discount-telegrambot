@@ -3,7 +3,6 @@ package ru.lapotko.discounttgbot.command;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.lapotko.discounttgbot.service.SendMessageService;
 
 @Component
 public class CommandContainer {
@@ -11,12 +10,12 @@ public class CommandContainer {
     private final UnknownCommand unknownCommand;
 
     @Autowired
-    public CommandContainer(SendMessageService sendMessageService) {
+    public CommandContainer() {
         commands = ImmutableMap.<String, Command>builder()
-                .put(CommandName.START.getName(), new StartCommand(sendMessageService))
-                .put(CommandName.NOCOMMAND.getName(), new NoCommand(sendMessageService))
+                .put(CommandName.START.getName(), new StartCommand())
+                .put(CommandName.NOCOMMAND.getName(), new NoCommand())
                 .build();
-        unknownCommand = new UnknownCommand(sendMessageService);
+        unknownCommand = new UnknownCommand();
     }
 
     public Command findCommand(String name){

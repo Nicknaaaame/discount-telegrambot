@@ -1,21 +1,16 @@
 package ru.lapotko.discounttgbot.command;
 
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import ru.lapotko.discounttgbot.service.SendMessageService;
+import ru.lapotko.discounttgbot.builder.MessageBuilder;
 
-public class UnknownCommand implements Command {
+public class UnknownCommand extends AbstractCommand {
     private static final String UNKNOWN_COMMAND_MESSAGE = "Unknown command";
 
-    private final SendMessageService sendMessageService;
-
-    public UnknownCommand(SendMessageService sendMessageService) {
-        this.sendMessageService = sendMessageService;
-    }
-
-
     @Override
-    public void execute(Update update) throws TelegramApiException {
-        sendMessageService.sendMessage(update.getMessage().getChatId(), UNKNOWN_COMMAND_MESSAGE);
+    public SendMessage execute(Update update) {
+        return MessageBuilder.builder(update.getMessage().getChatId())
+                .line(UNKNOWN_COMMAND_MESSAGE)
+                .build();
     }
 }

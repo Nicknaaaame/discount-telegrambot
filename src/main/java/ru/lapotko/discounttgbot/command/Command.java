@@ -1,8 +1,8 @@
 package ru.lapotko.discounttgbot.command;
 
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public interface Command {
-    void execute(Update update) throws TelegramApiException;
+    SendMessage execute(Update update);
 }
